@@ -2,23 +2,28 @@ from typing import List
 from block import Block
 import os
 import json
+MINE_DIR="mined"
+UNMINED_DIR="unmined"
 class Blockchain:
     def __init__(self):
         self.chain: List[Block] = []
         self.unmined_chain: List[Block] = [] 
         # self.create_genesis_block()
-        if not os.path.exists("mined") and not os.path.exists("unmined"):
-            os.mkdir("mined")
-            os.mkdir("unmined")
+        if not os.path.exists(MINE_DIR) and not os.path.exists("unmined"):
+            os.mkdir(MINE_DIR)
+            os.mkdir(UNMINED_DIR)
             self.create_genesis_block()
-        mined = os.listdir("mined")
-        unmined = os.listdir("unmined")
+        mined = sorted(os.listdir(MINE_DIR))
+        unmined = sorted(os.listdir(UNMINED_DIR))
         for m in mined:
-            with open("mined/"+m,"r") as f:
+            with open(MINE_DIR+os.sep+m,"r") as f:
                 data = json.load(f)
-            self.chain.append(Block(data["transaction"],data["nonce"],data["prev_hash"]))
+                block = Block(data["transaction"],data["nonce"],data["prev_hash"])
+                block.timestamp = data["timestamp"]
+                proof = data['hash']
+                self.add_block(block,proof)
         for m in unmined:
-            with open("unmined/"+m,"r") as f:
+            with open(UNMINED_DIR+os.sep++m,"r") as f:
                 data = json.load(f)
             self.unmined_chain.append(Block(data["transaction"],data["nonce"],data["prev_hash"]))
         self.show()
@@ -30,10 +35,11 @@ class Blockchain:
         if self.verify_proof(block, proof):
             block.hash = proof
             self.chain.append(block)
-            with open(f"mined/0000{str(len(self.chain))}.json","w") as f:
+            with open(f"{MINE_DIR}{os.sep}0000{str(len(self.chain))}.json","w") as f:
                 f.write(json.dumps(block.__dict__))
-            self.unmined_chain.remove(block)
-            os.remove(f"unmined/{str(len(self.chain))}.json")
+            if block in self.unmined_chain:
+                self.unmined_chain.remove(block)
+                os.remove(f"{UNMINED_DIR}{os.sep}{str(len(self.chain))}.json")
             print(f'Block #{len(self.chain)} added.')
             return True
         else:
@@ -49,7 +55,7 @@ class Blockchain:
     def add_transaction(self, tx: str):
         b = Block(tx, 0)
         self.unmined_chain.append(b)
-        with open(f"unmined/{str(len(self.chain)+len(self.unmined_chain))}.json","w") as f:
+        with open(f"{UNMINED_DIR}{os.sep}{str(len(self.chain)+len(self.unmined_chain))}.json","w") as f:
             f.write(json.dumps(b.__dict__))
 
     
