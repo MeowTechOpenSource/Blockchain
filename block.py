@@ -3,7 +3,7 @@ import hashlib
 import time
 
 class Block:
-    def __init__(self, transaction: str, nonce: int, prev_hash: str = "0"):
+    def __init__(self, transaction: dict, nonce: int, prev_hash: str = "0"):
         self.transaction = transaction
         self.nonce = nonce 
         self.timestamp = time.time()

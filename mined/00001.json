@@ -1,1 +1,1 @@
-{"transaction": "genesis block", "nonce": 7523, "timestamp": 1653114840.9813933, "prev_hash": "0", "hash": "0000f9d963a4566c513119b8c01689f593fea0615e289d2e1d219a3856282445"}
+{"transaction": {"from": "_", "to": "_", "amount": 0}, "nonce": 57023, "timestamp": 1654861908.094617, "prev_hash": "0", "hash": "00008f2d7ed35cf439acb14890e5a4654d32dc05be35023ab0537755b0ba776d"}

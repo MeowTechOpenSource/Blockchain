@@ -2,6 +2,7 @@ import json
 import os
 from time import time
 import requests
+import _thread
 NODES_FILENAME = "nodes.json"
 MASTER_NODE = ''
 
@@ -34,16 +35,26 @@ class Nodes:
                 response = requests.get(peer + 'peers', timeout=5)
                 if response.status_code == 200:
                     ps = response.json()['peers']
-                    for n in ps:
-                        self.add_node(n)
+                    new_ps = set()
+                    for p in ps:
+                        new_ps.add(p)
+                    self.peers = self.peers.union(new_ps)
                     break
             except Exception as e:
                 print(e)
+                self.failed_peers.add(peer)
+
         for p in self.peers:
             print('post', p)
-            try:
-                response = requests.post(p+'register_node', {
-                    'node_address': self.root_url
-                }, timeout=5)
-            except Exception:
-                pass
+            def knock_peer(addr):
+                try:
+                    response = requests.post(addr+'register_node', json={
+                        'node_address': self.root_url
+                    }, timeout=5)
+                    if response.status_code != 200:
+                        self.failed_peers.add(peer)
+                except Exception:
+                    self.failed_peers.add(peer)
+            _thread.start_new_thread(knock_peer,(peer,))
+                
+            

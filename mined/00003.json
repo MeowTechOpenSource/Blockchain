@@ -1,1 +1,1 @@
-{"transaction": "a, b, 80", "nonce": 47353, "timestamp": 1653114902.3420265, "prev_hash": "0000f9d963a4566c513119b8c01689f593fea0615e289d2e1d219a3856282445", "hash": "000094516af95eefb82a93c5f42dc250909a70d9c8fd427a450a93daa65c3cb2"}
+{"transaction": {"from": "felix", "amount": 1, "to": "alice"}, "nonce": 24012, "timestamp": 1654862096.5684633, "prev_hash": "00006ca9f093eea064d0088e84cce5f7e589c1f29d7d42572f6e76e20765b644", "hash": "0000b23ef50ebc4fbe6f1843b69e614ef488d46113c4b81f5c453ce5a4f07179"}
