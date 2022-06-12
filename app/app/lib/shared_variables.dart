@@ -6,5 +6,5 @@ class SharedVars {
   static String unminedChain = '';
 
   /// Make sure there is a '/' at the end of the url
-  static String blockchainUrl = 'https://Blockchain.felixwong6.repl.co/';
+  static String blockchainUrl = 'http://127.0.0.1:8000/';
 }

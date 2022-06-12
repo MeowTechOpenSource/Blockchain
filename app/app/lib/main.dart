@@ -9,7 +9,7 @@ import 'shared_variables.dart';
 main() => runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
       home: const LoginPage(),
-      theme: ThemeData(useMaterial3: true),
+      theme: ThemeData(useMaterial3: true,colorSchemeSeed: Colors.blue),
     ));
 
 class LoginPage extends StatefulWidget {

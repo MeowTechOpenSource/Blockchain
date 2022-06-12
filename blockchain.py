@@ -11,6 +11,7 @@ class Blockchain:
     def __init__(self):
         self.chain: List[Block] = []
         self.unmined_chain: List[Block] = []
+        self.failed_rm = []
         # self.create_genesis_block()
         if not os.path.exists(MINE_DIR) and not os.path.exists("unmined"):
             os.mkdir(MINE_DIR)
@@ -34,7 +35,8 @@ class Blockchain:
                 data = json.load(f)
             self.unmined_chain.append(
                 Block(data["transaction"], data["nonce"], data["prev_hash"]))
-        self.show()
+        #self.show()
+        print("Intialized Blockchain Object.")
 
     def create_genesis_block(self):
         self.add_transaction({"from":"_","to":"_","amount":0})
@@ -57,9 +59,19 @@ class Blockchain:
                 with open(f"{UNMINED_DIR}{os.sep}{files}", "r") as f:
                     data = json.load(f)
                     if data['timestamp'] == block.timestamp:
-                        os.remove(f"{UNMINED_DIR}{os.sep}{files}")
+                        try:
+                            os.remove(f"{UNMINED_DIR}{os.sep}{files}")
+                        except Exception:
+                            self.failed_rm.append(f"{UNMINED_DIR}{os.sep}{files}")
                         break
-            print(f'Block #{len(self.chain)} added.')
+            # Try Failed Again
+            for u in self.failed_rm:
+                try:
+                    os.remove(u)
+                    self.failed_rm.remove(u)
+                except Exception:
+                    pass
+            #print(f'Block #{len(self.chain)} added.')
             return True
         else:
             print('Incorrect proof.')

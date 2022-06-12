@@ -105,7 +105,7 @@ class FlaskServer:
                         return jsonify({"value":"Failed:Not enough balance."}),400
                     for ub in self.chain.unmined_chain:
                         tx = ub.transaction
-                        if tx["from"] == tx["from"]:
+                        if tx_data["from"] == tx["from"]:
                             if balance >= tx_data["amount"]:
                                 balance -= tx_data["amount"]
                             else:
@@ -155,9 +155,14 @@ class FlaskServer:
                 if r not in data:
                     return {'value':f'Missing field {r}'}, 400
             if data['username'] in self.users:
-                return {'correct':self.users[data['username']] == data['password']}
+                a = self.users[data['username']] == data['password']
+                if not a:
+                    code = 400
+                else:
+                    code = 200
+                return {'correct':a},code
             else:
-                return {'value':"User does not exist."}
+                return {'value':"User does not exist."}, 400
         @app.route('/peers')
         def peers():
             return jsonify({"peers":self.nodes.get_peers()})
@@ -192,48 +197,52 @@ class FlaskServer:
             if node == self.nodes.root_url:
                 continue
             if True:
-                response = requests.get(node + 'chain', timeout=5)
-                if response.status_code == 200:
-                    peer_json = response.json()
+                try:
+                    response = requests.get(node + 'chain', timeout=5)
+                    if response.status_code == 200:
+                        peer_json = response.json()
 
-                    if peer_json['length'] >= len(self.chain.chain):
-                        dicts = peer_json['chain']
-                        new_blocks: List[Block] = []
-                        new_hashes: List[str] = []
+                        if peer_json['length'] >= len(self.chain.chain):
+                            dicts = peer_json['chain']
+                            new_blocks: List[Block] = []
+                            new_hashes: List[str] = []
 
-                        prev_hash = '0'
-                        valid_chain = True
+                            prev_hash = '0'
+                            valid_chain = True
 
-                        for dict in dicts:
-                            block = Block(transaction=dict['transaction'], nonce=dict['nonce'],
-                                          prev_hash=dict['prev_hash'])
-                            block.timestamp = dict['timestamp']
+                            for dict in dicts:
+                                block = Block(transaction=dict['transaction'], nonce=dict['nonce'],
+                                            prev_hash=dict['prev_hash'])
+                                block.timestamp = dict['timestamp']
 
-                            # check validity of the chain:
-                            if prev_hash != block.prev_hash and dict['hash'] != block.compute_hash():
-                                valid_chain = False
-                                break
+                                # check validity of the chain:
+                                if prev_hash != block.prev_hash and dict['hash'] != block.compute_hash():
+                                    valid_chain = False
+                                    break
 
-                            new_blocks.append(block)
-                            new_hashes.append(dict['hash'])
-                            prev_hash = dict['hash']
+                                new_blocks.append(block)
+                                new_hashes.append(dict['hash'])
+                                prev_hash = dict['hash']
 
-                        if valid_chain:
-                            self.chain.replace_chain(new_blocks, new_hashes)
-                            response = requests.get(node + 'unmined_blocks')
-                            if response.status_code == 200:
-                                ub_json = response.json()
-                                ub = ub_json['unmined blocks']
-                            if len(self.chain.chain) < peer_json['length']:
-                                self.chain.replace_unmined_chain(ub)
-                            else:
-                                if len(self.chain.unmined_chain) < len(ub):
+                            if valid_chain:
+                                self.chain.replace_chain(new_blocks, new_hashes)
+                                response = requests.get(node + 'unmined_blocks')
+                                if response.status_code == 200:
+                                    ub_json = response.json()
+                                    ub = ub_json['unmined blocks']
+                                if len(self.chain.chain) < peer_json['length']:
                                     self.chain.replace_unmined_chain(ub)
-                            break
-                    else:
-                        # TODO: Check if both chains are identical
-                        pass
-            # except Exception as e:
+                                else:
+                                    if len(self.chain.unmined_chain) < len(ub):
+                                        self.chain.replace_unmined_chain(ub)
+                                break
+                        else:
+                            # TODO: Check if both chains are identical
+                            pass
+                except Exception as e:
+                    print("Exception",e)
+            
+                # except Exception as e:
             #     print("Exception: ", e)
             #     self.nodes.failed_peers.add(node)
             self.inited = True
