@@ -1,4 +1,4 @@
-from time import time
+import time
 from typing import List
 from block import Block
 import os
@@ -31,10 +31,13 @@ class Blockchain:
                 proof = data['hash']
                 self.add_block(block, proof)
         for m in unmined:
-            with open(UNMINED_DIR+os.sep+m, "r") as f:
-                data = json.load(f)
-            self.unmined_chain.append(
-                Block(data["transaction"], data["nonce"], data["prev_hash"]))
+            try:
+                with open(UNMINED_DIR+os.sep+m, "r") as f:
+                    data = json.load(f)
+                self.unmined_chain.append(
+                    Block(data["transaction"], data["nonce"], data["prev_hash"]))
+            except Exception as e:
+                print(e)
         #self.show()
         print("Intialized Blockchain Object.")
 
@@ -63,6 +66,7 @@ class Blockchain:
                             os.remove(f"{UNMINED_DIR}{os.sep}{files}")
                         except Exception:
                             self.failed_rm.append(f"{UNMINED_DIR}{os.sep}{files}")
+                            print("This Failed")
                         break
             # Try Failed Again
             for u in self.failed_rm:
@@ -80,13 +84,22 @@ class Blockchain:
     def verify_proof(self, block: Block, proof: str) -> bool:
         return proof == block.compute_hash() and proof.startswith('0000')
 
-    def add_transaction(self, tx: str,timestamp:float = 0):
+    def add_transaction(self, tx: str,timestamp:float = time.time()):
         b = Block(tx, 0)
         b.timestamp = timestamp
         self.unmined_chain.append(b)
         with open(f"{UNMINED_DIR}{os.sep}{str(len(self.chain)+len(self.unmined_chain))}.json", "w") as f:
             f.write(json.dumps(b.__dict__))
-
+    def checkmine(self,nonce):
+        b = self.unmined_chain[0]
+        b.prev_hash = self.chain[-1].hash
+        b.nonce = nonce
+        proof = b.compute_hash()
+        print(proof)
+        if self.verify_proof(b, proof):
+            return self.add_block(b, proof)
+        else:
+            return False
     def mine(self, genesis_block=False):
         if not self.unmined_chain:
             return "No transaction to mine..."

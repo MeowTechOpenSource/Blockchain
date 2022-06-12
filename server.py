@@ -3,6 +3,7 @@ import threading
 from urllib import response
 from flask import Flask, jsonify,request,abort
 import os
+from psutil import users
 import requests
 from block import Block
 from nodes import Nodes
@@ -113,26 +114,43 @@ class FlaskServer:
                         # Check To
                 else:
                    return jsonify({"value":"Failed:Could not get balance."}),400  
+            print(self.users)
+            if tx_data["to"] in self.users:
+                if not self.users[tx_data["from"]] == tx_data["password"]:
+                    return jsonify({"value":"Password incorrect"}),400    
             else:
-                if tx_data["to"] in self.users:
-                    if not self.users[tx_data["to"]] == tx_data["password"]:
-                        return jsonify({"value":"Password incorrect"}),400    
-                else:
-                  return jsonify({"value":"User does not exists"}),400    
+                return jsonify({"value":"User does not exists"}),400    
             del tx_data["password"]
+
             self.chain.add_transaction(tx_data)
             self.announce()
             return {"value":"OK"}
-        @app.route('/mine')
-        def mine():
-            um = self.chain.unmined_chain
-            if not um:
-                return {"value":"No unmined transactions"},200
+        @app.route('/completemined',methods=['POST'])
+        def completemine():
+            tx_data = request.get_json()
+            req = ["from","data","index"]
+            for r in req:
+                if r not in tx_data:
+                    return {'value':f'Missing field {r}'}, 400
+            if tx_data["from"] not in self.users:
+                return jsonify({"value":"User does not exists"}),400
             else:
-                a = self.chain.mine()
+                a = self.chain.checkmine(tx_data["data"]["nonce"])
                 if a:
                     self.announce()
-                return {"value":"Ran","success":a}
+                    return {"value":"Mined Successful"},200
+                else:
+                    return {"value":"Mined Unsuccessful"},400
+        # @app.route('/mine')
+        # def mine():
+        #     um = self.chain.unmined_chain
+        #     if not um:
+        #         return {"value":"No unmined transactions"},200
+        #     else:
+        #         a = self.chain.mine()
+        #         if a:
+        #             self.announce()
+        #         return {"value":"Ran","success":a}
         @app.route('/create_user',methods=['POST'])
         def create_user():
             data = request.get_json()

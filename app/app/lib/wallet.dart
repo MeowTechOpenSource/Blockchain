@@ -262,6 +262,34 @@ class _WalletState extends State<Wallet> {
                                                                       "The target of the transfer must not be you.")));
                                                         } else {
                                                           print("go");
+                                                          showDialog(
+                                                              barrierDismissible:
+                                                                  false,
+                                                              context: context,
+                                                              builder: (_) {
+                                                                return AlertDialog(
+                                                                  title: Text("Transfer"),
+                                                                  backgroundColor: Theme.of(
+                                                                          context)
+                                                                      .colorScheme
+                                                                      .surfaceVariant,
+                                                                  content:
+                                                                      Padding(
+                                                                    padding:
+                                                                        const EdgeInsets.all(
+                                                                            8.0),
+                                                                    child: Column(
+                                                                        mainAxisSize:
+                                                                            MainAxisSize.min,
+                                                                        children: [
+                                                                          CircularProgressIndicator(),
+                                                                          Text(
+                                                                              "Commiting Action...")
+                                                                        ]),
+                                                                  ),
+                                                                );
+                                                              });
+
                                                           var url = Uri.parse(
                                                               '${SharedVars.blockchainUrl}new_transaction');
                                                           var headers = {
@@ -285,21 +313,28 @@ class _WalletState extends State<Wallet> {
                                                                       headers,
                                                                   body: body)
                                                               .then((response) {
-                                                                print(response.body);
+                                                            Navigator.of(
+                                                                    context)
+                                                                .pop();
                                                             if (response
                                                                     .statusCode ==
                                                                 200) {
+                                                                  Navigator.of(context).pop();
                                                             } else {
                                                               showDialog(
                                                                   context:
                                                                       context,
                                                                   builder: (context) => AlertDialog(
+                                                                      backgroundColor: Theme.of(
+                                                                              context)
+                                                                          .colorScheme
+                                                                          .surfaceVariant,
                                                                       title: Text(response
                                                                           .statusCode
                                                                           .toString()),
                                                                       content: Text(
-                                                                          response
-                                                                              .body)));
+                                                                          jsonDecode(
+                                                                              response.body)["value"])));
                                                             }
                                                           });
                                                         }
