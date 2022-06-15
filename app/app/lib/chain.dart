@@ -117,6 +117,7 @@ class _ChainState extends State<Chain> {
               ),
               Stepper(
                 key: stepperKey,
+                physics: ClampingScrollPhysics(),
                 currentStep: currstep,
                 onStepTapped: (index) => setState(() => currstep = index),
                 controlsBuilder: (_, __) => Container(),
