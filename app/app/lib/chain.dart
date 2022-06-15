@@ -33,12 +33,14 @@ class Chain extends StatefulWidget {
 
 class _ChainState extends State<Chain> {
   @override
+  void initState() {
+    super.initState();
+    GetChain();
+  }
+
+  @override
   Widget build(BuildContext context) {
     something += 1;
-    void initState() {
-      super.initState();
-      GetChain();
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -64,9 +66,10 @@ class _ChainState extends State<Chain> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text("Show: ",style: TextStyle(fontSize: 17),),
+                    Text("Show: ", style: TextStyle(fontSize: 17)),
                     FilterChip(
-                      selectedColor: Theme.of(context).colorScheme.primaryContainer,
+                      selectedColor:
+                          Theme.of(context).colorScheme.primaryContainer,
                       selected: showm,
                       label: Text("Mined"),
                       onSelected: (a) {
@@ -82,9 +85,10 @@ class _ChainState extends State<Chain> {
                         setState(() {});
                       },
                     ),
-                    SizedBox(width: 10,),
+                    SizedBox(width: 10),
                     FilterChip(
-                        selectedColor: Theme.of(context).colorScheme.primaryContainer,
+                        selectedColor:
+                            Theme.of(context).colorScheme.primaryContainer,
                         selected: showum,
                         label: Text("Unmined"),
                         onSelected: (a) {
@@ -187,7 +191,7 @@ class _ChainState extends State<Chain> {
                   content: Text(response.body)));
         }
         if (showum) {
-          var url = Uri.parse('${SharedVars.blockchainUrl}unmined_chain');
+          var url = Uri.parse('${SharedVars.blockchainUrl}unmined_blocks');
           http.get(url).then((response) {
             if (response.statusCode == 200) {
               var data = jsonDecode(response.body);
