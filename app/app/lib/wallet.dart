@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ffi';
 
+import 'package:app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -113,19 +114,28 @@ class _WalletState extends State<Wallet> {
                       0.0), //position where you want to show the menu on screen
                   items: [
                     PopupMenuItem<String>(
-                        child: const Text('menu option 1'), value: '1'),
-                    PopupMenuItem<String>(
-                        child: const Text('menu option 2'), value: '2'),
-                    PopupMenuItem<String>(
-                        child: const Text('menu option 3'), value: '3'),
+                        child: const Text('Logout'), value: '1'),
                   ],
-                  elevation: 20.0,
-                );
+
+                  elevation: 20,
+                  color: Theme.of(context).colorScheme.surfaceVariant,
+                ).then((value) {
+                  if (value == null) {
+                  } else {
+                    SharedVars.username = "";
+                    SharedVars.password = "";
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginPage()),
+                    );
+                  }
+                });
               },
               child: Padding(
                 padding: const EdgeInsets.all(3.0),
                 child: CircleAvatar(
-                    backgroundColor: bg,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     child: Text(
                       SharedVars.username[0].toUpperCase(),
                       style: TextStyle(color: Colors.white),
@@ -268,7 +278,8 @@ class _WalletState extends State<Wallet> {
                                                               context: context,
                                                               builder: (_) {
                                                                 return AlertDialog(
-                                                                  title: Text("Transfer"),
+                                                                  title: Text(
+                                                                      "Transfer"),
                                                                   backgroundColor: Theme.of(
                                                                           context)
                                                                       .colorScheme
@@ -319,7 +330,9 @@ class _WalletState extends State<Wallet> {
                                                             if (response
                                                                     .statusCode ==
                                                                 200) {
-                                                                  Navigator.of(context).pop();
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
                                                             } else {
                                                               showDialog(
                                                                   context:

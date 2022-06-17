@@ -64,9 +64,16 @@ class _ChainState extends State<Chain> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text("Show: ",style: TextStyle(fontSize: 17),),
+                    Text(
+                      "Show: ",
+                      style: TextStyle(fontSize: 17),
+                    ),
                     FilterChip(
-                      selectedColor: Theme.of(context).colorScheme.primaryContainer,
+                      pressElevation: 0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8))),
+                      selectedColor:
+                          Theme.of(context).colorScheme.primaryContainer,
                       selected: showm,
                       label: Text("Mined"),
                       onSelected: (a) {
@@ -82,9 +89,15 @@ class _ChainState extends State<Chain> {
                         setState(() {});
                       },
                     ),
-                    SizedBox(width: 10,),
+                    SizedBox(
+                      width: 10,
+                    ),
                     FilterChip(
-                        selectedColor: Theme.of(context).colorScheme.primaryContainer,
+                        pressElevation: 0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8))),
+                        selectedColor:
+                            Theme.of(context).colorScheme.primaryContainer,
                         selected: showum,
                         label: Text("Unmined"),
                         onSelected: (a) {
