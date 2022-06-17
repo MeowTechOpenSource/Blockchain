@@ -3,7 +3,7 @@ import re
 import requests
 import json
 SERVER_URL = "http://localhost:8000/"
-response = requests.get(SERVER_URL+"unmined_chain")
+response = requests.get(SERVER_URL+"unmined_blocks")
 unmined_blocks = response.json()['unmined blocks']
 response = requests.get(SERVER_URL+"chain")
 chain = response.json()['chain']
@@ -33,13 +33,11 @@ for b in unmined_blocks:
             b["hash"] = c
             break
     unmined_blocks.remove(org)
-    print(org)
-    print(b)
     resp = requests.post(SERVER_URL+"completemined",json={
         "from":"test",
         "data":b,
         "index":0
     })
-    print(resp.content)
+    print(resp.json()["value"])
     chain.append(b)
 

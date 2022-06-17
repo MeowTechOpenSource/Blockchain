@@ -1,0 +1,1 @@
+{"transaction": {"from": "test", "to": "a", "amount": 31992.0}, "nonce": 162611, "timestamp": 1655478259.6653738, "prev_hash": "0000b103fd1d5b8df890b7b247ba5f1e6b3820c12bfc28400c02bcd8d2bb297a", "hash": "0000d5f4a4aeccc22e0a7b82d3110d3c5564dc9fec312f2420df86176858abc9"}

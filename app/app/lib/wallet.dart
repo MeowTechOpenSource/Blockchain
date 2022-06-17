@@ -165,7 +165,7 @@ class _WalletState extends State<Wallet> {
                         Text(
                           hidebal
                               ? "MTC\$${balance.toString().replaceAll(RegExp("[0-9]"), "•")} (HKD\$0.0)"
-                              : "MTC\$${balance.toString()} (HKD\$0.0)",
+                              : "MTC\$${balance.toString()} (HKD\$${(balance*0.0001).toString()})",
                           style: TextStyle(fontSize: 18, color: Colors.white),
                         ),
                         Spacer(),
