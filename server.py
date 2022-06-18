@@ -83,11 +83,7 @@ class FlaskServer:
 
         @app.route('/unmined_blocks')
         def get_unmined_chain():
-            chain_dict = {"unmined blocks": self.chain.unmined_chain}
-            value = json.loads(json.dumps(chain_dict,
-                                          default=lambda obj: obj.__dict__))
-            value["length"] = len(value["unmined blocks"])
-            return jsonify(value)
+            return json.dumps({"unmined blocks" : self.chain.unmined_chain, "length": len(self.chain.unmined_chain)},default=lambda obj: obj.__dict__)
 
         @app.route('/new_transaction', methods=['POST'])
         def add_transaction():
@@ -138,7 +134,7 @@ class FlaskServer:
         @app.route('/completemined', methods=['POST'])
         def completemine():
             tx_data = request.get_json()
-            req = ["from", "data", "index"]
+            req = ["from", "data"]
             for r in req:
                 if r not in tx_data:
                     return {'value': f'Missing field {r}'}, 400

@@ -1,6 +1,4 @@
-from flask import Flask, jsonify,request,abort
 from blockchain import Blockchain
-import json
 
 from server import FlaskServer
 users = {}

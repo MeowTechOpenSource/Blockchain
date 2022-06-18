@@ -17,9 +17,9 @@ class Blockchain:
             os.mkdir(MINE_DIR)
             os.mkdir(UNMINED_DIR)
             self.create_genesis_block()
-        
+
         def sort_file(s):
-                return int(s.split('.')[0])
+            return int(s.split('.')[0])
         mined = sorted(os.listdir(MINE_DIR), key=sort_file)
         unmined = sorted(os.listdir(UNMINED_DIR), key=sort_file)
         for m in mined:
@@ -34,15 +34,18 @@ class Blockchain:
             try:
                 with open(UNMINED_DIR+os.sep+m, "r") as f:
                     data = json.load(f)
-                self.unmined_chain.append(
-                    Block(data["transaction"], data["nonce"], data["prev_hash"]))
+                    b = Block(data["transaction"], data["nonce"], data["prev_hash"])
+                    b.timestamp = data["timestamp"]
+                    self.unmined_chain.append(b)
             except Exception as e:
                 print(e)
-        #self.show()
+        # self.show()
+        for b in self.unmined_chain:
+            print(b.timestamp)
         print("Intialized Blockchain Object.")
 
     def create_genesis_block(self):
-        self.add_transaction({"from":"_","to":"_","amount":0})
+        self.add_transaction({"from": "_", "to": "_", "amount": 0})
         self.mine(genesis_block=True)
 
     def add_block(self, block: Block, proof: str) -> bool:
@@ -59,23 +62,26 @@ class Blockchain:
                     self.unmined_chain.remove(block)
                     break
             for files in os.listdir(UNMINED_DIR):
-                with open(f"{UNMINED_DIR}{os.sep}{files}", "r") as f:
-                    data = json.load(f)
-                    if data['timestamp'] == block.timestamp:
-                        try:
-                            os.remove(f"{UNMINED_DIR}{os.sep}{files}")
-                        except Exception:
-                            self.failed_rm.append(f"{UNMINED_DIR}{os.sep}{files}")
-                            print("This Failed")
-                        break
-            # Try Failed Again
-            for u in self.failed_rm:
-                try:
-                    os.remove(u)
-                    self.failed_rm.remove(u)
-                except Exception:
-                    pass
-            #print(f'Block #{len(self.chain)} added.')
+                f = open(f"{UNMINED_DIR}{os.sep}{files}", "r")
+                data = json.load(f)
+                f.close()
+                if data['timestamp'] == block.timestamp:
+                    try:
+                        os.remove(f"{UNMINED_DIR}{os.sep}{files}")
+                    except Exception:
+                        self.failed_rm.append(
+                            f"{UNMINED_DIR}{os.sep}{files}")
+                        print("This Failed")
+                    break
+
+            # # Try Failed Again
+            # for u in self.failed_rm:
+            #     try:
+            #         os.remove(u)
+            #         self.failed_rm.remove(u)
+            #     except Exception:
+            #         pass
+            # print(f'Block #{len(self.chain)} added.')
             return True
         else:
             print('Incorrect proof.')
@@ -84,22 +90,27 @@ class Blockchain:
     def verify_proof(self, block: Block, proof: str) -> bool:
         return proof == block.compute_hash() and proof.startswith('0000')
 
-    def add_transaction(self, tx: str,timestamp:float = time.time()):
+    def add_transaction(self, tx: str, timestamp: float = time.time()):
         b = Block(tx, 0)
         b.timestamp = timestamp
         self.unmined_chain.append(b)
         with open(f"{UNMINED_DIR}{os.sep}{str(len(self.chain)+len(self.unmined_chain))}.json", "w") as f:
             f.write(json.dumps(b.__dict__))
-    def checkmine(self,nonce):
+
+    def checkmine(self, nonce):
         b = self.unmined_chain[0]
         b.prev_hash = self.chain[-1].hash
+
         b.nonce = nonce
+        print(b.__dict__)
         proof = b.compute_hash()
         print(proof)
+        print('verify: ', self.verify_proof(b, proof))
         if self.verify_proof(b, proof):
             return self.add_block(b, proof)
         else:
             return False
+
     def mine(self, genesis_block=False):
         if not self.unmined_chain:
             return "No transaction to mine..."
@@ -125,12 +136,23 @@ class Blockchain:
         self.chain.clear()
         for i in range(len(chain)):
             self.add_block(chain[i], hashes[i])
-    def replace_unmined_chain(self, unmined_chain:List[Block]):
+
+    def replace_unmined_chain(self, unmined_chain: List[Block]):
         self.unmined_chain.clear()
         for files in os.listdir(UNMINED_DIR):
             os.remove(UNMINED_DIR+os.sep+files)
         for ub in unmined_chain:
             tx_data = ub['transaction']
             timestamp = ub['timestamp']
-            self.add_transaction(tx_data,timestamp=timestamp)
-            
+            self.add_transaction(tx_data, timestamp=timestamp)
+
+
+
+'''miner.py
+{'transaction': {'amount': 12300, 'from': '_', 'to': 'a'}, 'nonce': 20241, 'timestamp': 1654913762.0673869, 'prev_hash': '000065e6262a9321dd3bfe2b5c9546bb42208925974fa5751b1a28e0f7c7ba5a', 'hash': ''}
+'''
+
+
+'''blockchain.py
+{'transaction': {'from': '_', 'to': 'a', 'amount': 12300}, 'nonce': 6878, 'timestamp': 1654913762.0673869, 'prev_hash': '000065e6262a9321dd3bfe2b5c9546bb42208925974fa5751b1a28e0f7c7ba5a', 'hash': ''}
+'''
