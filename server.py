@@ -3,7 +3,6 @@ import threading
 from urllib import response
 from flask import Flask, jsonify, request, abort
 import os
-from psutil import users
 import requests
 from block import Block
 from nodes import Nodes
