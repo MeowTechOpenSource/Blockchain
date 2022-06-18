@@ -74,8 +74,14 @@ class _ChainState extends State<Chain> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text("Show: ", style: TextStyle(fontSize: 17)),
+                    Text(
+                      "Show: ",
+                      style: TextStyle(fontSize: 17),
+                    ),
                     FilterChip(
+                      pressElevation: 0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8))),
                       selectedColor:
                           Theme.of(context).colorScheme.primaryContainer,
                       selected: showm,
@@ -94,8 +100,13 @@ class _ChainState extends State<Chain> {
                         getChain();
                       },
                     ),
-                    SizedBox(width: 10),
+                    SizedBox(
+                      width: 10,
+                    ),
                     FilterChip(
+                        pressElevation: 0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(8))),
                         selectedColor:
                             Theme.of(context).colorScheme.primaryContainer,
                         selected: showum,
