@@ -1,6 +1,4 @@
 import json
-import threading
-from urllib import response
 from flask import Flask, jsonify, request, abort
 import os
 import requests
@@ -8,6 +6,9 @@ from block import Block
 from nodes import Nodes
 from typing import List
 from block import Block
+
+
+from flask_cors import CORS
 
 USERDATADIR = "users"
 
@@ -40,6 +41,7 @@ class FlaskServer:
 
     def run(self):
         app = Flask("API")
+        CORS(app)
 
         @app.before_first_request
         def init():
@@ -82,7 +84,7 @@ class FlaskServer:
 
         @app.route('/unmined_blocks')
         def get_unmined_chain():
-            return json.dumps({"unmined blocks" : self.chain.unmined_chain, "length": len(self.chain.unmined_chain)},default=lambda obj: obj.__dict__)
+            return json.dumps({"unmined blocks": self.chain.unmined_chain, "length": len(self.chain.unmined_chain)}, default=lambda obj: obj.__dict__)
 
         @app.route('/new_transaction', methods=['POST'])
         def add_transaction():
