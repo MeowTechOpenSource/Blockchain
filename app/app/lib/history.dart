@@ -28,30 +28,28 @@ class _HistoryState extends State<History> {
       body: ListView.builder(
         itemCount: dataobs.length,
         itemBuilder: (context, index) {
-          return Container(
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      DateTime.fromMicrosecondsSinceEpoch(
-                              (dataobs[index].timestamp * 1000000).round())
-                          .toString(),
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    Divider(),
-                    Text(
-                      "Transaction Details",
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    Text("Amount: \$" + dataobs[index].amount.toString()),
-                    Text("From: " + dataobs[index].from.toString()),
-                    Text("To: " + dataobs[index].to.toString())
-                  ],
-                ),
+          return Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    DateTime.fromMicrosecondsSinceEpoch(
+                            (dataobs[index].timestamp * 1000000).round())
+                        .toString(),
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  Divider(),
+                  Text(
+                    "Transaction Details",
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  Text("Amount: \$" + dataobs[index].amount.toString()),
+                  Text("From: " + dataobs[index].from.toString()),
+                  Text("To: " + dataobs[index].to.toString())
+                ],
               ),
             ),
           );
@@ -79,7 +77,7 @@ class _HistoryState extends State<History> {
           }
           c.nonce = d["nonce"];
           c.hash = d["hash"];
-          c.prevhash = d["prev_hash"];
+          c.prevHash = d["prev_hash"];
           c.timestamp = double.parse(d["timestamp"].toString());
           c.amount = double.parse(d["transaction"]["amount"].toString());
           if (c.from == SharedVars.username || c.to == SharedVars.username) {

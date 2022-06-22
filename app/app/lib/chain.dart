@@ -90,9 +90,7 @@ class _ChainState extends State<Chain> {
                         getChain();
                       },
                     ),
-                    SizedBox(
-                      width: 10,
-                    ),
+                    SizedBox(width: 10),
                     FilterChip(
                         pressElevation: 0,
                         shape: RoundedRectangleBorder(
@@ -152,7 +150,7 @@ class _ChainState extends State<Chain> {
 
             c.nonce = d["nonce"];
             c.hash = d["hash"];
-            c.prevhash = d["prev_hash"];
+            c.prevHash = d["prev_hash"];
             c.timestamp = double.parse(d["timestamp"].toString());
             c.amount = double.parse(d["transaction"]["amount"].toString());
             am += 1;
@@ -195,7 +193,7 @@ class _ChainState extends State<Chain> {
               }
               c.nonce = d["nonce"];
               c.hash = d["hash"];
-              c.prevhash = d["prev_hash"];
+              c.prevHash = d["prev_hash"];
               c.timestamp = double.parse(d["timestamp"].toString());
               c.amount = double.parse(d["transaction"]["amount"].toString());
               c.title = "Unmined Block";
