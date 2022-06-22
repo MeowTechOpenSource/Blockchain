@@ -1,19 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'model/block.dart';
 import 'shared_variables.dart';
 import 'package:http/http.dart' as http;
-
-class ChainData2 {
-  String from = '';
-  String to = '';
-  double amount = 0;
-  int nonce = 0;
-  double timestamp = 0;
-  String hash = '';
-  String prevhash = '';
-  int id = 0;
-}
 
 var dataobs = [];
 
@@ -31,7 +21,7 @@ class _HistoryState extends State<History> {
       appBar: AppBar(title: Text("History")),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          GetChain();
+          getChain();
         },
         child: Icon(Icons.refresh),
       ),
@@ -43,23 +33,25 @@ class _HistoryState extends State<History> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              DateTime.fromMicrosecondsSinceEpoch((dataobs[index].timestamp * 1000000).round() ).toString(),
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                            Divider(),
-                            Text(
-                              "Transaction Details",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                            Text("Amount: \$" + dataobs[index].amount.toString()),
-                            Text("From: " + dataobs[index].from.toString()),
-                            Text("To: " + dataobs[index].to.toString())
-                          ],
-                        ),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      DateTime.fromMicrosecondsSinceEpoch(
+                              (dataobs[index].timestamp * 1000000).round())
+                          .toString(),
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    Divider(),
+                    Text(
+                      "Transaction Details",
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    Text("Amount: \$" + dataobs[index].amount.toString()),
+                    Text("From: " + dataobs[index].from.toString()),
+                    Text("To: " + dataobs[index].to.toString())
+                  ],
+                ),
               ),
             ),
           );
@@ -68,7 +60,7 @@ class _HistoryState extends State<History> {
     );
   }
 
-  void GetChain() {
+  void getChain() {
     var dataobjs2 = [];
     var url = Uri.parse('${SharedVars.blockchainUrl}chain');
     http.get(url).then((response) {
@@ -76,7 +68,7 @@ class _HistoryState extends State<History> {
         var data = jsonDecode(response.body);
 
         for (var d in data["chain"]) {
-          ChainData2 c = ChainData2();
+          Block c = Block();
           c.from = d["transaction"]["from"];
           c.to = d["transaction"]["to"];
           if (c.from == "_") {

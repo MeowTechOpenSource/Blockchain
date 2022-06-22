@@ -6,17 +6,7 @@ import 'package:app/shared_variables.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class ChainData {
-  String from = '';
-  String to = '';
-  double amount = 0;
-  int nonce = 0;
-  double timestamp = 0;
-  String hash = '';
-  String prevhash = '';
-  String title = 'Transaction';
-  int id = 0;
-}
+import 'model/block.dart';
 
 class Chain extends StatefulWidget {
   const Chain({Key? key}) : super(key: key);
@@ -27,8 +17,8 @@ class Chain extends StatefulWidget {
 
 class _ChainState extends State<Chain> {
   /// Separate lists of blocks, responsible for building the steps:
-  List<ChainData> minedData = [];
-  List<ChainData> unmineData = [];
+  List<Block> minedData = [];
+  List<Block> unmineData = [];
 
   /// Key for stepper, only updates when the lists of blocks changed.
   /// When we use a Stepper, flutter will remember the number of the steps (e.g. 10).
@@ -149,11 +139,11 @@ class _ChainState extends State<Chain> {
 
       /// Update the lists of mined blocks
       if (response.statusCode == 200) {
-        List<ChainData> dataobjs = [];
+        List<Block> dataobjs = [];
         var data = jsonDecode(response.body);
         if (showm) {
           for (var d in data["chain"]) {
-            ChainData c = ChainData();
+            Block c = Block();
 
             c.from = d["transaction"]["from"];
             c.to = d["transaction"]["to"];
@@ -190,11 +180,11 @@ class _ChainState extends State<Chain> {
         var url = Uri.parse('${SharedVars.blockchainUrl}unmined_blocks');
         http.get(url).then((response) {
           if (response.statusCode == 200) {
-            List<ChainData> dataobjs = [];
+            List<Block> dataobjs = [];
 
             var data = jsonDecode(response.body);
             for (var d in data["unmined blocks"]) {
-              ChainData c = ChainData();
+              Block c = Block();
               c.from = d["transaction"]["from"];
               c.to = d["transaction"]["to"];
               if (c.from == "_") {
@@ -233,7 +223,7 @@ class _ChainState extends State<Chain> {
   }
 
   List<Step> buildSteps({required bool showMined, required bool showUnmine}) {
-    List<ChainData> blocks = [];
+    List<Block> blocks = [];
     if (showMined) {
       blocks.addAll(minedData);
     }
