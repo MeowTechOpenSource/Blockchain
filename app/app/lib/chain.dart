@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:app/blockchain_api.dart';
 import 'package:app/shared_variables.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -16,9 +17,8 @@ class Chain extends StatefulWidget {
 }
 
 class _ChainState extends State<Chain> {
-  /// Separate lists of blocks, responsible for building the steps:
-  List<Block> minedData = [];
-  List<Block> unmineData = [];
+  /// Indicator to update stepperKey below
+  int prevChainLength = 0;
 
   /// Key for stepper, only updates when the lists of blocks changed.
   /// When we use a Stepper, flutter will remember the number of the steps (e.g. 10).
@@ -35,205 +35,116 @@ class _ChainState extends State<Chain> {
   bool showum = false;
 
   @override
-  void initState() {
-    super.initState();
-    getChain();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Chain')),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          getChain();
-        },
-        child: Icon(Icons.refresh),
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          getChain();
-        },
-        child: SingleChildScrollView(
-          physics:
-              BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Show: ",
-                      style: TextStyle(fontSize: 17),
-                    ),
-                    FilterChip(
+      body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "Show: ",
+                    style: TextStyle(fontSize: 17),
+                  ),
+                  FilterChip(
+                    pressElevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8))),
+                    selectedColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                    selected: showm,
+                    label: Text("Mined"),
+                    onSelected: (a) {
+                      setState(() {
+                        showm = a;
+                        if (!showm && !showum) {
+                          print("Err");
+                          showm = true;
+                        }
+                        currstep = 0;
+                        stepperKey = UniqueKey();
+                      });
+                    },
+                  ),
+                  SizedBox(width: 10),
+                  FilterChip(
                       pressElevation: 0,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(8))),
                       selectedColor:
                           Theme.of(context).colorScheme.primaryContainer,
-                      selected: showm,
-                      label: Text("Mined"),
+                      selected: showum,
+                      label: Text("Unmined"),
                       onSelected: (a) {
                         setState(() {
-                          showm = a;
-                          if (!showm && !showum) {
-                            print("Err");
-                            showm = true;
-                          }
+                          showum = a;
                           currstep = 0;
                           stepperKey = UniqueKey();
+
+                          if (!showm && !showum) {
+                            showm = true;
+                          }
                         });
-
-                        getChain();
-                      },
-                    ),
-                    SizedBox(width: 10),
-                    FilterChip(
-                        pressElevation: 0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8))),
-                        selectedColor:
-                            Theme.of(context).colorScheme.primaryContainer,
-                        selected: showum,
-                        label: Text("Unmined"),
-                        onSelected: (a) {
-                          setState(() {
-                            showum = a;
-                            currstep = 0;
-                            stepperKey = UniqueKey();
-
-                            if (!showm && !showum) {
-                              showm = true;
-                            }
-                          });
-                          getChain();
-                        }),
-                  ],
-                ),
+                      }),
+                ],
               ),
-              Stepper(
-                key: stepperKey,
-                physics: ClampingScrollPhysics(),
-                currentStep: currstep,
-                onStepTapped: (index) => setState(() => currstep = index),
-                controlsBuilder: (_, __) => Container(),
-                steps: buildSteps(showMined: showm, showUnmine: showum),
-              )
-            ],
-          ),
+            ),
+            StreamBuilder<List<Block>>(
+                stream: BlockchainAPI.chainStream(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(child: Icon(Icons.error_outline));
+                  }
+
+                  if (!snapshot.hasData) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+
+                  final steps = buildSteps(chain: snapshot.data!);
+
+                  if (steps.isEmpty) {
+                    steps.add(Step(
+                      title: Text('No transaction'),
+                      content: SizedBox(),
+                    ));
+                  }
+
+                  return Stepper(
+                    key: stepperKey,
+                    physics: ClampingScrollPhysics(),
+                    currentStep: currstep,
+                    onStepTapped: (index) => setState(() => currstep = index),
+                    controlsBuilder: (_, __) => SizedBox(),
+                    steps: steps,
+                  );
+                }),
+          ],
         ),
       ),
     );
   }
 
-  void getChain() {
-    var url = Uri.parse('${SharedVars.blockchainUrl}chain');
-
-    http.get(url).then((response) {
-      int am = 0;
-
-      /// Update the lists of mined blocks
-      if (response.statusCode == 200) {
-        List<Block> dataobjs = [];
-        var data = jsonDecode(response.body);
-        if (showm) {
-          for (var d in data["chain"]) {
-            Block c = Block();
-
-            c.from = d["transaction"]["from"];
-            c.to = d["transaction"]["to"];
-            if (c.from == "_") c.from = "System";
-            if (c.to == "_") c.to = "System";
-
-            c.nonce = d["nonce"];
-            c.hash = d["hash"];
-            c.prevHash = d["prev_hash"];
-            c.timestamp = double.parse(d["timestamp"].toString());
-            c.amount = double.parse(d["transaction"]["amount"].toString());
-            am += 1;
-            c.id = am;
-            dataobjs.add(c);
-          }
-
-          setState(() {
-            if (minedData.length != dataobjs.length) {
-              stepperKey = UniqueKey();
-            }
-            minedData = dataobjs;
-          });
-        }
-      } else {
-        showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-                title: Text(response.statusCode.toString()),
-                content: Text(response.body)));
-      }
-
-      /// Update the lists of unmine blocks
-      if (showum) {
-        var url = Uri.parse('${SharedVars.blockchainUrl}unmined_blocks');
-        http.get(url).then((response) {
-          if (response.statusCode == 200) {
-            List<Block> dataobjs = [];
-
-            var data = jsonDecode(response.body);
-            for (var d in data["unmined blocks"]) {
-              Block c = Block();
-              c.from = d["transaction"]["from"];
-              c.to = d["transaction"]["to"];
-              if (c.from == "_") {
-                c.from = "System";
-              }
-              if (c.to == "_") {
-                c.to = "System";
-              }
-              c.nonce = d["nonce"];
-              c.hash = d["hash"];
-              c.prevHash = d["prev_hash"];
-              c.timestamp = double.parse(d["timestamp"].toString());
-              c.amount = double.parse(d["transaction"]["amount"].toString());
-              c.title = "Unmined Block";
-              am += 1;
-              c.id = am;
-              dataobjs.add(c);
-            }
-
-            setState(() {
-              if (unmineData.length != dataobjs.length) {
-                stepperKey = UniqueKey();
-              }
-              unmineData = dataobjs;
-            });
-          } else {
-            showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                    title: Text(response.statusCode.toString()),
-                    content: Text(response.body)));
-          }
-        });
-      }
-    });
-  }
-
-  List<Step> buildSteps({required bool showMined, required bool showUnmine}) {
-    List<Block> blocks = [];
-    if (showMined) {
-      blocks.addAll(minedData);
-    }
-    if (showUnmine) {
-      blocks.addAll(unmineData);
-    }
-
+  List<Step> buildSteps({required List<Block> chain}) {
     List<Step> steps = [];
-    if (blocks.isEmpty) {
-      /// Add a dummy step:
+
+    List<Block> blocks = chain;
+    if (showm && !showum) {
+      blocks = chain.where((block) => block.hash.isNotEmpty).toList();
+    } else if (!showm && showum) {
+      blocks = chain.where((block) => block.hash.isEmpty).toList();
+    }
+
+    for (int i = 0; i < blocks.length; i++) {
+      Block b = blocks[i];
+
       steps.add(Step(
-        title: Text("Transaction #1"),
+        isActive: i == currstep,
+        title: Text("${b.title} #${b.id}"),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -242,49 +153,27 @@ class _ChainState extends State<Chain> {
               "Block Details",
               style: TextStyle(fontWeight: FontWeight.w600),
             ),
-            Text("Hash: "),
-            Text("Nonce: "),
-            Text("Timestamp: "),
+            Text("Hash: ${b.hash}"),
+            Text("Nonce: ${b.nonce}"),
+            Text("Timestamp: ${b.timestamp}"),
             Divider(),
             Text(
               "Transaction Details",
               style: TextStyle(fontWeight: FontWeight.w600),
             ),
-            Text("Amount: \$ 0"),
-            Text("From: "),
-            Text("To: "),
+            Text("Amount: \$${b.amount}"),
+            Text("From: ${b.from}"),
+            Text("To: ${b.to}")
           ],
         ),
       ));
-    } else {
-      /// Create steps from all ChainData
-      for (var b in blocks) {
-        steps.add(Step(
-          title: Text("${b.title} #${b.id}"),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                "Block Details",
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              Text("Hash: ${b.hash}"),
-              Text("Nonce: ${b.nonce}"),
-              Text("Timestamp: ${b.timestamp}"),
-              Divider(),
-              Text(
-                "Transaction Details",
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              Text("Amount: \$${b.amount}"),
-              Text("From: ${b.from}"),
-              Text("To: ${b.to}")
-            ],
-          ),
-        ));
-      }
     }
+
+    if (prevChainLength != chain.length) {
+      prevChainLength = chain.length;
+      stepperKey = UniqueKey();
+    }
+
     return steps;
   }
 }
