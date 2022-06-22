@@ -86,6 +86,11 @@ class FlaskServer:
         def get_unmined_chain():
             return json.dumps({"unmined blocks": self.chain.unmined_chain, "length": len(self.chain.unmined_chain)}, default=lambda obj: obj.__dict__)
 
+        @app.route('/all_blocks')
+        def get_all_blocks():
+            chain = self.chain.chain + self.chain.unmined_chain
+            return json.dumps({'chain': chain, 'length': len(chain)}, default=lambda obj: obj.__dict__)
+
         @app.route('/new_transaction', methods=['POST'])
         def add_transaction():
             self.consensus()
