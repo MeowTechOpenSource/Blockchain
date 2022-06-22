@@ -28,7 +28,15 @@ class _HistoryState extends State<History> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("History")),
+      appBar: AppBar(
+        title: Text(
+          'History',
+          style: TextStyle(fontSize: 26, fontWeight: FontWeight.w500),
+        ),
+        backgroundColor: Color.fromARGB(255, 241, 243, 245),
+        surfaceTintColor: Color.fromARGB(255, 241, 243, 245),
+      ),
+      backgroundColor: Color.fromARGB(255, 241, 243, 245),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           GetChain();
@@ -43,23 +51,25 @@ class _HistoryState extends State<History> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              DateTime.fromMicrosecondsSinceEpoch((dataobs[index].timestamp * 1000000).round() ).toString(),
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                            Divider(),
-                            Text(
-                              "Transaction Details",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                            Text("Amount: \$" + dataobs[index].amount.toString()),
-                            Text("From: " + dataobs[index].from.toString()),
-                            Text("To: " + dataobs[index].to.toString())
-                          ],
-                        ),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      DateTime.fromMicrosecondsSinceEpoch(
+                              (dataobs[index].timestamp * 1000000).round())
+                          .toString(),
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    Divider(),
+                    Text(
+                      "Transaction Details",
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    Text("Amount: \$" + dataobs[index].amount.toString()),
+                    Text("From: " + dataobs[index].from.toString()),
+                    Text("To: " + dataobs[index].to.toString())
+                  ],
+                ),
               ),
             ),
           );

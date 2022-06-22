@@ -53,7 +53,14 @@ class _ChainState extends State<Chain> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Chain')),
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 241, 243, 245),
+        surfaceTintColor: Color.fromARGB(255, 241, 243, 245),
+        title: Text(
+          'Chain',
+          style: TextStyle(fontSize: 26, fontWeight: FontWeight.w500),
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           getChain();
@@ -67,74 +74,79 @@ class _ChainState extends State<Chain> {
         child: SingleChildScrollView(
           physics:
               BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Show: ",
-                      style: TextStyle(fontSize: 17),
-                    ),
-                    FilterChip(
-                      pressElevation: 0,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(8))),
-                      selectedColor:
-                          Theme.of(context).colorScheme.primaryContainer,
-                      selected: showm,
-                      label: Text("Mined"),
-                      onSelected: (a) {
-                        setState(() {
-                          showm = a;
-                          if (!showm && !showum) {
-                            print("Err");
-                            showm = true;
-                          }
-                          currstep = 0;
-                          stepperKey = UniqueKey();
-                        });
-
-                        getChain();
-                      },
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    FilterChip(
+          child: Container(
+            color: Color.fromARGB(255, 241, 243, 245),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Show: ",
+                        style: TextStyle(fontSize: 17),
+                      ),
+                      FilterChip(
+                        showCheckmark: false,
                         pressElevation: 0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8))),
+                        // shape: RoundedRectangleBorder(
+                        //     borderRadius: BorderRadius.all(Radius.circular(8))),
                         selectedColor:
-                            Theme.of(context).colorScheme.primaryContainer,
-                        selected: showum,
-                        label: Text("Unmined"),
+                            Color.fromARGB(255, 10, 89, 247).withOpacity(0.2),
+                        selected: showm,
+                        label: Text("Mined"),
                         onSelected: (a) {
                           setState(() {
-                            showum = a;
-                            currstep = 0;
-                            stepperKey = UniqueKey();
-
+                            showm = a;
                             if (!showm && !showum) {
+                              print("Err");
                               showm = true;
                             }
+                            currstep = 0;
+                            stepperKey = UniqueKey();
                           });
+
                           getChain();
-                        }),
-                  ],
+                        },
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      FilterChip(
+                          pressElevation: 0,
+                          showCheckmark: false,
+                          // shape: RoundedRectangleBorder(
+                          //     borderRadius: BorderRadius.all(Radius.circular(8))),
+                          selectedColor:
+                              Color.fromARGB(255, 10, 89, 247).withOpacity(0.2),
+                          selected: showum,
+                          label: Text("Unmined"),
+                          onSelected: (a) {
+                            setState(() {
+                              showum = a;
+                              currstep = 0;
+                              stepperKey = UniqueKey();
+
+                              if (!showm && !showum) {
+                                showm = true;
+                              }
+                            });
+                            getChain();
+                          }),
+                    ],
+                  ),
                 ),
-              ),
-              Stepper(
-                key: stepperKey,
-                physics: ClampingScrollPhysics(),
-                currentStep: currstep,
-                onStepTapped: (index) => setState(() => currstep = index),
-                controlsBuilder: (_, __) => Container(),
-                steps: buildSteps(showMined: showm, showUnmine: showum),
-              )
-            ],
+                Stepper(
+                  key: stepperKey,
+                  physics: ClampingScrollPhysics(),
+                  currentStep: currstep,
+                  onStepTapped: (index) => setState(() => currstep = index),
+                  controlsBuilder: (_, __) => Container(),
+                  steps: buildSteps(showMined: showm, showUnmine: showum),
+                )
+              ],
+            ),
           ),
         ),
       ),
