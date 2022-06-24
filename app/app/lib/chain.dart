@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:app/blockchain_api.dart';
 import 'package:app/shared_variables.dart';
+import 'package:image_sequence_animator/image_sequence_animator.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -64,9 +65,8 @@ class _ChainState extends State<Chain> {
                     FilterChip(
                       showCheckmark: false,
                       pressElevation: 0,
-                      
                       selectedColor:
-                            Color.fromARGB(255, 10, 89, 247).withOpacity(0.2),
+                          Color.fromARGB(255, 10, 89, 247).withOpacity(0.2),
                       selected: showm,
                       label: Text("Mined"),
                       onSelected: (a) {
@@ -107,11 +107,41 @@ class _ChainState extends State<Chain> {
                   stream: BlockchainAPI.chainStream(),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
-                      return Container(color: Color.fromARGB(255, 241, 243, 245),child: Expanded(child: Center(child: Icon(Icons.error_outline))));
+                      return Container(
+                          color: Color.fromARGB(255, 241, 243, 245),
+                          child: Expanded(
+                              child: Center(child: Icon(Icons.error_outline))));
                     }
 
                     if (!snapshot.hasData) {
-                      return Container(color: Color.fromARGB(255, 241, 243, 245),child: Center(child:CircularProgressIndicator()));
+                      return Container(
+                          color: Color.fromARGB(255, 241, 243, 245),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: 70,
+                                  width: 70,
+                                  child: ImageSequenceAnimator(
+                                    "res/progress_light",
+                                    "loading 24dp-",
+                                    0,
+                                    1,
+                                    "png",
+                                    35,
+                                    isLooping: true,
+                                    isAutoPlay: true,
+                                    key: Key("offline"),
+                                    onReadyToPlay: onOfflineReadyToPlay,
+                                    onPlaying: onOfflinePlaying,
+                                    fps: 40,
+                                    
+                                  ),
+                                ),
+                                Text("Loading...")
+                              ],
+                            ),
+                          ));
                     }
 
                     final steps = buildSteps(chain: snapshot.data!);
@@ -151,7 +181,7 @@ class _ChainState extends State<Chain> {
 
     for (int i = 0; i < blocks.length; i++) {
       Block b = blocks[i];
-      if (b.hash.isEmpty){
+      if (b.hash.isEmpty) {
         b.title = "Unmined Transaction";
       }
       steps.add(Step(
@@ -187,5 +217,13 @@ class _ChainState extends State<Chain> {
     }
 
     return steps;
+  }
+
+  void onOfflineReadyToPlay(ImageSequenceAnimatorState _imageSequenceAnimator) {
+    //offlineImageSequenceAnimator = _imageSequenceAnimator;
+  }
+
+  void onOfflinePlaying(ImageSequenceAnimatorState _imageSequenceAnimator) {
+    // setState(() {});
   }
 }

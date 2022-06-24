@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'model/block.dart';
 import 'shared_variables.dart';
@@ -36,28 +36,57 @@ class _HistoryState extends State<History> {
       body: ListView.builder(
         itemCount: dataobs.length,
         itemBuilder: (context, index) {
-          return Card(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    DateTime.fromMicrosecondsSinceEpoch(
-                            (dataobs[index].timestamp * 1000000).round())
-                        .toString(),
-                    style: TextStyle(fontWeight: FontWeight.w600),
+          String me = (dataobs[index].from.toString() == SharedVars.username) ? "-" : "";
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+            child: ExpandableNotifier(
+              child: ScrollOnExpand(
+                scrollOnExpand: true,
+                scrollOnCollapse: false,
+                child: Card(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(18))),
+                  elevation: 0,
+                  color: Colors.white,
+                  surfaceTintColor: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: ExpandablePanel(
+                      header: Padding(
+                        padding: const EdgeInsets.fromLTRB(2, 0, 0, 0),
+                        child: Text(
+                          DateTime.fromMicrosecondsSinceEpoch(
+                                  (dataobs[index].timestamp * 1000000).round())
+                              .toString(),
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      collapsed: Padding(
+                        padding: const EdgeInsets.fromLTRB(3, 0, 16, 0),
+                        child: Text("MTC \$"+ me +dataobs[index].amount.toString(),style: TextStyle(
+                          color: (me == "-") ? Colors.red : Colors.black,
+                        ),),
+                      ),
+                      expanded: Padding(
+                        padding: const EdgeInsets.fromLTRB(3, 0, 16, 0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text("Amount: \$" + dataobs[index].amount.toString()),
+                            Text("From: " + dataobs[index].from.toString()),
+                            Text("To: " + dataobs[index].to.toString())
+                          ],
+                        ),
+                      ),
+                      theme: ExpandableThemeData(
+                          headerAlignment: ExpandablePanelHeaderAlignment.center,
+                          tapBodyToCollapse: true,
+                          tapHeaderToExpand: true,
+                          inkWellBorderRadius:
+                              BorderRadius.all(Radius.circular(13))),
+                    ),
                   ),
-                  Divider(),
-                  Text(
-                    "Transaction Details",
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  Text("Amount: \$" + dataobs[index].amount.toString()),
-                  Text("From: " + dataobs[index].from.toString()),
-                  Text("To: " + dataobs[index].to.toString())
-                ],
+                ),
               ),
             ),
           );

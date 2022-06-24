@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:harmonyos/harmonyos.dart';
-
+import 'package:image_sequence_animator/image_sequence_animator.dart';
 import 'package:app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -246,9 +246,36 @@ class _WalletState extends State<Wallet> {
                                                                         8.0),
                                                                 child: Column(
                                                                     mainAxisSize:
-                                                                        MainAxisSize.min,
+                                                                        MainAxisSize
+                                                                            .min,
                                                                     children: [
-                                                                      CircularProgressIndicator(),
+                                                                      SizedBox(
+                                                                        height:
+                                                                            70,
+                                                                        width:
+                                                                            70,
+                                                                        child:
+                                                                            ImageSequenceAnimator(
+                                                                          "res/progress_light",
+                                                                          "loading 24dp-",
+                                                                          0,
+                                                                          1,
+                                                                          "png",
+                                                                          35,
+                                                                          isLooping:
+                                                                              true,
+                                                                          isAutoPlay:
+                                                                              true,
+                                                                          key: Key(
+                                                                              "offline"),
+                                                                          onReadyToPlay:
+                                                                              onOfflineReadyToPlay,
+                                                                          onPlaying:
+                                                                              onOfflinePlaying,
+                                                                          fps:
+                                                                              40,
+                                                                        ),
+                                                                      ),
                                                                       Text(
                                                                           "Commiting Action...")
                                                                     ]),
@@ -407,5 +434,13 @@ class _WalletState extends State<Wallet> {
             ],
           ),
         ));
+  }
+
+  void onOfflineReadyToPlay(ImageSequenceAnimatorState _imageSequenceAnimator) {
+    //offlineImageSequenceAnimator = _imageSequenceAnimator;
+  }
+
+  void onOfflinePlaying(ImageSequenceAnimatorState _imageSequenceAnimator) {
+    // setState(() {});
   }
 }
