@@ -9,6 +9,7 @@ class MyButton extends StatelessWidget {
   late Color backgroundColor;
   late Color textColor;
   late double borderRadius;
+  late double padding;
 
   MyButton({
     Key? key,
@@ -19,6 +20,7 @@ class MyButton extends StatelessWidget {
     this.backgroundColor = const Color(0xFF0A59F7),
     this.textColor = Colors.white,
     this.borderRadius = 25,
+    this.padding = 0,
   }) : super(key: key);
 
   @override
@@ -37,7 +39,10 @@ class MyButton extends StatelessWidget {
         child: InkWell(
           onTap: () => onPressed(),
           splashColor: Color.fromARGB(0, 255, 94, 94),
-          child: Center(child: child),
+          child: Padding(
+            padding: EdgeInsets.all(padding),
+            child: Center(child: child),
+          ),
           borderRadius: BorderRadius.circular(borderRadius),
         ),
       ),

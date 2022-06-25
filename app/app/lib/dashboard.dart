@@ -57,9 +57,10 @@ class _DashBoardState extends State<DashBoard> {
           //Call animation to restart
           //doanimation(buttonId, prev);
         },
+        padding: 10,
         backgroundColor: Colors.transparent,
         borderRadius: 7,
-        height: 57,
+        height: 70,
         textColor: buttonId == pageIndex
             ? Color.fromARGB(255, 10, 89, 247)
             : Color.fromARGB(255, 144, 145, 147),
@@ -79,39 +80,30 @@ class _DashBoardState extends State<DashBoard> {
     return Container(
       width: double.infinity,
       color: Color.fromARGB(255, 241, 243, 245),
-      child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            //NavBar Item
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: buildPhoneNavBtn(
-                      0,
-                      Icons.account_balance_wallet,
-                      'Wallet',
-                    ),
-                  ),
-                  Expanded(
-                    child: buildPhoneNavBtn(
-                      1,
-                      Icons.api_sharp,
-                      'Chain',
-                    ),
-                  ),
-                  Expanded(
-                    child: buildPhoneNavBtn(2, Icons.history, 'History'),
-                  ),
-                  Expanded(
-                    child: buildPhoneNavBtn(3, Icons.bug_report, 'Debug'),
-                  )
-                ],
-              ),
-            )
-          ]),
+      child: Row(
+        children: [
+          Expanded(
+            child: buildPhoneNavBtn(
+              0,
+              Icons.account_balance_wallet,
+              'Wallet',
+            ),
+          ),
+          Expanded(
+            child: buildPhoneNavBtn(
+              1,
+              Icons.api_sharp,
+              'Chain',
+            ),
+          ),
+          Expanded(
+            child: buildPhoneNavBtn(2, Icons.history, 'History'),
+          ),
+          Expanded(
+            child: buildPhoneNavBtn(3, Icons.bug_report, 'Debug'),
+          )
+        ],
+      ),
     );
   }
 }
