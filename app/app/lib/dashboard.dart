@@ -61,13 +61,13 @@ class _DashBoardState extends State<DashBoard> {
         borderRadius: 7,
         height: 57,
         textColor: buttonId == pageIndex
-            ? Color.fromARGB(255, 10, 89, 247)
+            ? Color.fromARGB(255, 243, 77, 80)
             : Color.fromARGB(255, 144, 145, 147),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Icon(
             iconData,
             color: buttonId == pageIndex
-                ? Color.fromARGB(255, 10, 89, 247)
+                ? Color.fromARGB(255, 243, 77, 80)
                 : Color.fromARGB(255, 144, 145, 147),
           ),
           //SizedBox(width: 5),

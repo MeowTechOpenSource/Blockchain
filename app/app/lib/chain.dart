@@ -66,7 +66,7 @@ class _ChainState extends State<Chain> {
                       showCheckmark: false,
                       pressElevation: 0,
                       selectedColor:
-                          Color.fromARGB(255, 10, 89, 247).withOpacity(0.2),
+                          Color.fromARGB(255, 243, 77, 80).withOpacity(0.4),
                       selected: showm,
                       label: Text("Mined"),
                       onSelected: (a) {
@@ -86,7 +86,7 @@ class _ChainState extends State<Chain> {
                         pressElevation: 0,
                         showCheckmark: false,
                         selectedColor:
-                            Color.fromARGB(255, 10, 89, 247).withOpacity(0.2),
+                            Color.fromARGB(255, 243, 77, 80).withOpacity(0.4),
                         selected: showum,
                         label: Text("Unmined"),
                         onSelected: (a) {
@@ -135,7 +135,6 @@ class _ChainState extends State<Chain> {
                                     onReadyToPlay: onOfflineReadyToPlay,
                                     onPlaying: onOfflinePlaying,
                                     fps: 40,
-                                    
                                   ),
                                 ),
                                 Text("Loading...")
