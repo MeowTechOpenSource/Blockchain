@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:harmonyos/harmonyos.dart';
 import 'package:image_sequence_animator/image_sequence_animator.dart';
 import 'package:app/main.dart';
+import 'port/my_popup_menu.dart' as my_menu;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -112,7 +113,8 @@ class _WalletState extends State<Wallet> {
             MaterialButton(
               shape: CircleBorder(),
               onPressed: () {
-                showMenu<String>(
+                my_menu
+                    .showMenu<String>(
                   context: context,
                   constraints:
                       const BoxConstraints(minHeight: 50, minWidth: 150),
@@ -121,13 +123,17 @@ class _WalletState extends State<Wallet> {
                   position: RelativeRect.fromLTRB(25.0, 25.0, 0.0,
                       0.0), //position where you want to show the menu on screen
                   items: [
-                    PopupMenuItem<String>(
-                        child: const Text('Logout'), value: '1'),
+                    my_menu.PopupMenuItem<String>(
+                      child: const Text('Logout'),
+                      value: '1',
+                      borderRadius: 20,
+                    ),
                   ],
 
                   elevation: 20,
                   // color: Theme.of(context).colorScheme.surfaceVariant,
-                ).then((value) {
+                )
+                    .then((value) {
                   if (value == null) {
                   } else {
                     SharedVars.username = "";
