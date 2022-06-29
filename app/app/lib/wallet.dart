@@ -123,11 +123,17 @@ class _WalletState extends State<Wallet> {
                   position: RelativeRect.fromLTRB(25.0, 25.0, 0.0,
                       0.0), //position where you want to show the menu on screen
                   items: [
+                    
                     my_menu.PopupMenuItem<String>(
                       child: const Text('Logout'),
                       value: '1',
-                      borderRadius: 20,
+                      borderRadius: 14,
                     ),
+                    // my_menu.PopupMenuItem<String>(
+                    //   child: const Text('Logout'),
+                    //   value: '1',
+                    //   borderRadius: 14,
+                    // ),
                   ],
 
                   elevation: 20,

@@ -5,12 +5,17 @@ import 'package:http/http.dart' as http;
 
 import 'dashboard.dart';
 import 'shared_variables.dart';
+import 'port/factory.dart';
 
 main() => runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
       home: const LoginPage(),
       theme: ThemeData(
           useMaterial3: true,
+          splashFactory: InkFade.splashFactory,
+          elevatedButtonTheme: ElevatedButtonThemeData(style: ButtonStyle(
+            splashFactory: InkFade.splashFactory,
+          )),
           colorSchemeSeed: Color.fromARGB(255, 243, 77, 80)),
     ));
 

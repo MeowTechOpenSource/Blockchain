@@ -2,13 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart';
 
-const Duration _kMenuDuration = Duration(milliseconds: 300);
+const Duration _kMenuDuration = Duration.zero;
 const double _kMenuCloseIntervalEnd = 2.0 / 3.0;
 const double _kMenuHorizontalPadding = 16.0;
 const double _kMenuDividerHeight = 16.0;
 const double _kMenuMaxWidth = 5.0 * _kMenuWidthStep;
 const double _kMenuMinWidth = 2.0 * _kMenuWidthStep;
-const double _kMenuVerticalPadding = 0.0;
+const double _kMenuVerticalPadding = 4.0;
 const double _kMenuWidthStep = 56.0;
 const double _kMenuScreenPadding = 8.0;
 const double _kDefaultIconSize = 24.0;
@@ -179,19 +179,27 @@ class PopupMenuItemState<T, W extends PopupMenuItem<T>> extends State<W> {
       );
     }
 
-    return MergeSemantics(
-      child: Semantics(
-        enabled: widget.enabled,
-        button: true,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(widget.borderRadius ?? 0),
-          onTap: widget.enabled ? handleTap : null,
-          canRequestFocus: widget.enabled,
-          mouseCursor: _EffectiveMouseCursor(
-              widget.mouseCursor, popupMenuTheme.mouseCursor),
-          child: item,
+    return Column(
+      children: [
+        
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: MergeSemantics(
+            child: Semantics(
+              enabled: widget.enabled,
+              button: true,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(widget.borderRadius ?? 0),
+                onTap: widget.enabled ? handleTap : null,
+                canRequestFocus: widget.enabled,
+                mouseCursor: _EffectiveMouseCursor(
+                    widget.mouseCursor, popupMenuTheme.mouseCursor),
+                child: item,
+              ),
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 }
@@ -228,16 +236,16 @@ class CheckedPopupMenuItem<T> extends PopupMenuItem<T> {
 class _CheckedPopupMenuItemState<T>
     extends PopupMenuItemState<T, CheckedPopupMenuItem<T>>
     with SingleTickerProviderStateMixin {
-  static const Duration _fadeDuration = Duration(milliseconds: 150);
+  static const Duration _fadeDuration = Duration(milliseconds: 1500);
   late AnimationController _controller;
   Animation<double> get _opacity => _controller.view;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(duration: _fadeDuration, vsync: this)
-      ..value = widget.checked ? 1.0 : 0.0
-      ..addListener(() => setState(() {/* animation changed */}));
+    // _controller = AnimationController(duration: Duration(seconds: 5), vsync: this)
+    //   ..value = widget.checked ? 1.0 : 0.0
+    //   ..addListener(() => setState(() {/* animation changed */}));
   }
 
   @override
@@ -277,7 +285,7 @@ class _PopupMenu<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double unit = 1.0 / (route.items.length + 1.5);
-    final List<Widget> children = <Widget>[];
+    final List<Widget> children = <Widget>[Padding(padding: EdgeInsets.fromLTRB(15,0,15,0),child: Divider(thickness: 0.5,indent: 0,height: 1,))];
     final PopupMenuThemeData popupMenuTheme = PopupMenuTheme.of(context);
 
     for (int i = 0; i < route.items.length; i += 1) {
@@ -285,7 +293,7 @@ class _PopupMenu<T> extends StatelessWidget {
       final double end = (start + 1.5 * unit).clamp(0.0, 1.0);
       final CurvedAnimation opacity = CurvedAnimation(
         parent: route.animation!,
-        curve: Interval(start, end),
+        curve: Interval(0, 1),
       );
       Widget item = route.items[i];
       if (route.initialValue != null &&
@@ -300,19 +308,19 @@ class _PopupMenu<T> extends StatelessWidget {
           onLayout: (Size size) {
             route.itemSizes[i] = size;
           },
-          child: FadeTransition(
-            opacity: opacity,
-            child: item,
-          ),
+          child: item,
         ),
       );
+      //Custom: Divider
+      children.add(Padding(padding: EdgeInsets.fromLTRB(15,0,15,0),child: Divider(thickness: 0.5,indent: 0,height: 1,)));
+      
     }
 
     final CurveTween opacity =
-        CurveTween(curve: const Interval(0.0, 1.0 / 3.0));
-    final CurveTween width = CurveTween(curve: Interval(0.0, unit));
+        CurveTween(curve: const Interval(0.0, 1.0 / 3.0,curve: Curves.fastLinearToSlowEaseIn),);
+    final CurveTween width = CurveTween(curve: Interval(unit, unit));
     final CurveTween height =
-        CurveTween(curve: Interval(0.0, unit * route.items.length));
+        CurveTween(curve: Interval(unit * route.items.length, unit * route.items.length));
 
     final Widget child = ConstrainedBox(
       constraints: constraints ??
@@ -331,7 +339,7 @@ class _PopupMenu<T> extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
               vertical: _kMenuVerticalPadding,
             ),
-            child: ListBody(children: children),
+            child: SingleChildScrollView(child: ListBody(children: children)),
           ),
         ),
       ),
@@ -340,18 +348,22 @@ class _PopupMenu<T> extends StatelessWidget {
     return AnimatedBuilder(
       animation: route.animation!,
       builder: (BuildContext context, Widget? child) {
+        print(route.animation!);
         return FadeTransition(
           opacity: opacity.animate(route.animation!),
-          child: Material(
-            shape: route.shape ?? popupMenuTheme.shape,
-            color: route.color ?? popupMenuTheme.color,
-            type: MaterialType.card,
-            elevation: route.elevation ?? popupMenuTheme.elevation ?? 8.0,
-            child: Align(
-              alignment: AlignmentDirectional.topEnd,
-              widthFactor: width.evaluate(route.animation!),
-              heightFactor: height.evaluate(route.animation!),
-              child: child,
+          child: Container(
+            child: Material(
+              shadowColor: Colors.black,
+              shape: route.shape ?? popupMenuTheme.shape,
+              color: route.color ?? popupMenuTheme.color,
+              type: MaterialType.card,
+              elevation: route.elevation ?? popupMenuTheme.elevation ?? 8.0,
+              child: Align(
+                alignment: AlignmentDirectional.topEnd,
+                widthFactor: width.evaluate(route.animation!),
+                heightFactor: height.evaluate(route.animation!),
+                child: child,
+              ),
             ),
           ),
         );
