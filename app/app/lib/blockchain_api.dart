@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:app/model/block.dart';
+import 'package:app/shared_variables.dart';
 import 'package:http/http.dart' as http;
 
 class BlockchainAPI {
-  static const String _endpoint = 'http://127.0.0.1:8000';
+  static String _endpoint = SharedVars.blockchainUrl;
 
   static Stream<List<Block>> chainStream() {
     return Stream.periodic(Duration(seconds: 1)).asyncMap((_) => _getChain());

@@ -182,6 +182,7 @@ class FlaskServer:
 
         @app.route('/login', methods=['POST'])
         def login():
+            print(request.data)
             data = request.get_json()
             req = ["username", "password"]
             for r in req:
